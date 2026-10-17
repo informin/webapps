@@ -42,7 +42,7 @@ export default {
     // CORS protects the browser integration; it is NOT user authentication.
     if (origin !== ALLOWED_ORIGIN) return reply({ error: "허용되지 않은 요청 출처입니다." }, 403, origin);
 
-    if (request.method === "OPTIONS") return reply({}, 204, origin);
+    if (request.method === "OPTIONS") return reply({}, 200, origin);
     if (request.method !== "POST") return reply({ error: "POST 요청만 지원합니다." }, 405, origin);
     if (!env.GEMINI_API_KEY || !env.CHAT_ACCESS_TOKEN) {
       return reply({ error: "Cloudflare Secret 설정이 필요합니다." }, 503, origin);
