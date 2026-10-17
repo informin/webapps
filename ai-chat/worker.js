@@ -27,6 +27,21 @@ function reply(data, status = 200, origin = "") {
   return new Response(JSON.stringify(data), { status, headers });
 }
 
+// Keep Google's diagnostic text in account-only Cloudflare logs, never in the browser.
+// Redact credentials/identifiers defensively before writing even private logs.
+function sanitizeGeminiErrorMessage(rawMessage, apiKey) {
+  let message = String(rawMessage || "(Google did not return an error message)").slice(0, 1600);
+  if (apiKey) message = message.split(String(apiKey)).join("[REDACTED]");
+  return message
+    .replace(/\bAIza[A-Za-z0-9_-]{10,}\b/g, "[REDACTED_KEY]")
+    .replace(/\bBearer\s+[A-Za-z0-9._~-]+/gi, "Bearer [REDACTED]")
+    .replace(/((?:api[_ -]?key|access[_ -]?token|secret|authorization)\s*[:=]\s*)[^\s,;]+/gi, "$1[REDACTED]")
+    .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[REDACTED_EMAIL]")
+    .replace(/\b\d{10,}\b/g, "[REDACTED_ID]")
+    .replace(/https?:\/\/[^\s]+/gi, "[REDACTED_URL]")
+    .slice(0, 500);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -102,8 +117,14 @@ export default {
         // Google's full error message is deliberately not returned to the browser.
         // It may include account- or project-specific information.
         const errorData = await googleResponse.json().catch(() => ({}));
-        const providerStatus = String(errorData?.error?.status || "UNKNOWN").slice(0, 40);
-        console.error("Gemini API error", googleResponse.status, providerStatus);
+        const providerStatus = String(errorData?.error?.status || "UNKNOWN")
+          .replace(/[^A-Z_]/g, "").slice(0, 40) || "UNKNOWN";
+        const safeMessage = sanitizeGeminiErrorMessage(errorData?.error?.message, env.GEMINI_API_KEY);
+        console.error("Gemini API diagnostic", {
+          httpStatus: googleResponse.status,
+          googleStatus: providerStatus,
+          googleMessage: safeMessage
+        });
         if (googleResponse.status === 429) {
           return reply({ error: "Gemini API 사용량 또는 요청 횟수 한도에 도달했습니다. 잠시 후 다시 시도하세요. (429)" }, 429, origin);
         }
