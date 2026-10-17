@@ -6,7 +6,7 @@
 // Never commit either secret value to GitHub.
 
 const ALLOWED_ORIGIN = "https://informin.github.io";
-const MODEL = "gemini-2.5-flash";
+const MODEL = "gemini-3.8-flash";
 const MAX_MESSAGES = 18;
 const MAX_TEXT_LENGTH = 3500;
 const MAX_PAYLOAD_LENGTH = 28000;
@@ -93,20 +93,33 @@ export default {
             systemInstruction: {
               parts: [{ text: "당신은 친절하고 정확한 한국어 AI 도우미입니다. 질문 언어에 맞춰 답하고, 모르면 모른다고 하세요. 개인 정보나 비밀값을 묻지 마세요." }]
             },
-            generationConfig: { temperature: 0.7, maxOutputTokens: 2400 }
+            generationConfig: { maxOutputTokens: 3200, thinkingConfig: { thinkingLevel: "low" } }
           })
         }
       );
 
       if (!googleResponse.ok) {
-        console.error("Gemini API HTTP status:", googleResponse.status);
+        // Google's full error message is deliberately not returned to the browser.
+        // It may include account- or project-specific information.
+        const errorData = await googleResponse.json().catch(() => ({}));
+        const providerStatus = String(errorData?.error?.status || "UNKNOWN").slice(0, 40);
+        console.error("Gemini API error", googleResponse.status, providerStatus);
         if (googleResponse.status === 429) {
-          return reply({ error: "Gemini API 요청 한도에 도달했습니다. 잠시 후 다시 시도하세요." }, 429, origin);
+          return reply({ error: "Gemini API 사용량 또는 요청 횟수 한도에 도달했습니다. 잠시 후 다시 시도하세요. (429)" }, 429, origin);
         }
-        if (googleResponse.status === 400 || googleResponse.status === 404) {
-          return reply({ error: "Gemini 모델 설정을 확인해 주세요." }, 502, origin);
+        if (googleResponse.status === 400) {
+          const message = providerStatus === "FAILED_PRECONDITION"
+            ? "Gemini API 무료 사용 가능 지역이나 결제 설정을 확인해 주세요."
+            : "Gemini API 요청 형식을 확인해 주세요.";
+          return reply({ error: message + " (400 / " + providerStatus + ")" }, 502, origin);
         }
-        return reply({ error: "Gemini API 요청에 실패했습니다. API 키와 사용량을 확인해 주세요." }, 502, origin);
+        if (googleResponse.status === 404) {
+          return reply({ error: "요청한 Gemini 모델을 사용할 수 없습니다. 모델 ID 또는 프로젝트의 모델 접근 권한을 확인해 주세요. (404 / " + providerStatus + ")" }, 502, origin);
+        }
+        if (googleResponse.status === 401 || googleResponse.status === 403) {
+          return reply({ error: "Gemini API 키의 유효성, 프로젝트 접근 권한 및 API 제한 설정을 확인해 주세요. (" + googleResponse.status + " / " + providerStatus + ")" }, 502, origin);
+        }
+        return reply({ error: "Gemini API 서버 오류입니다. (" + googleResponse.status + " / " + providerStatus + ")" }, 502, origin);
       }
 
       const json = await googleResponse.json();
