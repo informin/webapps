@@ -43,3 +43,13 @@ GitHub Pages 프런트엔드 + Cloudflare Worker + Gemini API로 구성한 개�
 - 400 오류는 요청 형식이나 결제 설정, 404 오류는 모델/프로젝트 접근 문제, 401/403은 API 키/권한 문제일 수 있습니다. Worker는 상태 코드와 안전한 범주의 원인을 표시하지만 Google의 원문 오류나 비밀값을 그대로 브라우저로 전달하지 않습니다.
 - **GitHub의 `worker.js` 수정은 Cloudflare에 자동 배포되지 않습니다.** 변경된 전체 소스를 Cloudflare의 `cf-test` > Edit code에 붙여넣고 Deploy해야 합니다.
 - Google AI Studio의 사용량 및 과금 설정을 확인하세요. 3.8 Flash는 무료 API 요청이 제공되는지 프로젝트 별 확인이 필요하며, 유료 호출 시 비용이 발생할 수 있습니다.
+
+## Cloudflare 진단 로그로 Gemini API 오류 확인
+
+1. 최신 `worker.js`를 Cloudflare `cf-test` > **Edit code**에 전체 붙여넣고 **Deploy**합니다. (GitHub 수정만으로는 Worker가 업데이트되지 않습니다.)
+2. `cf-test`의 **Observability > Logs**에서 로그를 열거나 **Logs > Live**를 선택합니다. 실시간 로그를 보려면 수집이 활성화되어 있어야 합니다.
+3. 새 탭에서 [AI 채팅](https://informin.github.io/webapps/ai-chat/)에 짧은 질문을 한 번 전송합니다.
+4. 로그에서 `Gemini API diagnostic` 항목을 확인합니다. `httpStatus`, `googleStatus`, `googleMessage`가 표시됩니다. `googleMessage`는 Google 오류 설명에서 키/이메일/URL/긴 숫자를 가린 최대 500글자입니다.
+5. Cloudflare 로그에는 접속 시각 및 요청 정보가 함께 나타날 수 있습니다. 로그 전체를 공유하지 말고 해당 진단 항목에서 민감 정보가 없는지 확인한 뒤 필요한 부분만 공유하세요.
+
+일반 사용자에게 반환되는 응답에는 이 Google 오류 원문을 포함하지 않습니다. 사용 종료 후에는 상세 진단 로그가 필요한지만 검토하세요.
