@@ -5,7 +5,7 @@ GitHub Pages 프런트엔드 + Cloudflare Worker + Gemini API로 구성한 개�
 - 웹앱: https://informin.github.io/webapps/ai-chat/
 - Cloudflare Worker: https://cf-test.mws-5ee.workers.dev/
 - 서버 소스: [worker.js](./worker.js)
-- 기본 모델: gemini-2.5-flash
+- 기본 모델: gemini-3.8-flash (2026년 10월 현재 Google 권장 3.8 Flash; 응답의 thinkingLevel=low)
 
 ## 처음 설정하는 방법
 
@@ -36,3 +36,10 @@ GitHub Pages 프런트엔드 + Cloudflare Worker + Gemini API로 구성한 개�
 ```
 
 헤더에는 `Content-Type: application/json`과 `X-Chat-Token: <CHAT_ACCESS_TOKEN>`을 사용합니다.
+
+## 모델 업데이트와 API 오류
+
+- 2026년 9월부터 신규 프로젝트의 Gemini 2.5 접근이 제한되어 404 NOT_FOUND가 발생할 수 있습니다. 공식 권장 신규 모델인 `gemini-3.8-flash`로 변경했습니다.
+- 400 오류는 요청 형식이나 결제 설정, 404 오류는 모델/프로젝트 접근 문제, 401/403은 API 키/권한 문제일 수 있습니다. Worker는 상태 코드와 안전한 범주의 원인을 표시하지만 Google의 원문 오류나 비밀값을 그대로 브라우저로 전달하지 않습니다.
+- **GitHub의 `worker.js` 수정은 Cloudflare에 자동 배포되지 않습니다.** 변경된 전체 소스를 Cloudflare의 `cf-test` > Edit code에 붙여넣고 Deploy해야 합니다.
+- Google AI Studio의 사용량 및 과금 설정을 확인하세요. 3.8 Flash는 무료 API 요청이 제공되는지 프로젝트 별 확인이 필요하며, 유료 호출 시 비용이 발생할 수 있습니다.
