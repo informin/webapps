@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10213f">
+<meta name="description" content="고등학교 정보과학 C언어 100문항 문제은행. PDF 교재 기반 단답형, 실행 결과, 코드 빈칸, 오류 수정, 응용 문제를 풀고 자동 채점합니다.">
+<title>C언어 문제은행 | 정보과학</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:#12213e;background:#f6f8fc;--blue:#315fdb;--ink:#12213e;--muted:#61728d;--border:#dce5f1;--bg:#f6f8fc;--paper:#fff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+a{color:inherit}
+header{background:#0e1e38;color:white;padding:18px max(20px,calc((100vw - 1090px)/2));display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+header .brand{font-weight:850;font-size:21px;letter-spacing:-.5px}
+header .sub{font-size:12px;color:#b7c7e0;margin-top:3px}
+header a{color:#cbdaf5;font-size:13px;text-decoration:none;border:1px solid #415777;border-radius:9px;padding:9px 12px}
+main{max-width:1090px;margin:32px auto 70px;padding:0 18px}
+h1{margin:0 0 9px;font-size:31px;letter-spacing:-1.2px}
+h2{font-size:20px;margin:0 0 12px;letter-spacing:-.6px}
+p{line-height:1.75}
+.muted{color:var(--muted)}
+.panel{background:var(--paper);border:1px solid var(--border);border-radius:19px;padding:26px;box-shadow:0 6px 25px rgba(27,50,94,.045)}
+.hero{display:grid;grid-template-columns:1.5fr 1fr;gap:20px}
+.hero-info{padding:8px 0}
+.eyebrow{display:inline-flex;gap:6px;align-items:center;color:#244eb5;background:#eaf0ff;padding:7px 11px;border-radius:30px;font-weight:750;font-size:12px;margin-bottom:16px}
+.lead{font-size:15px;color:#536783;max-width:590px;margin:0}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}
+.kpi{background:#f1f5fb;border:1px solid #e6edf6;border-radius:12px;padding:16px 13px}
+.kpi strong{font-size:25px;display:block}
+.kpi span{font-size:12px;color:#667894}
+.alert{background:#f7f9ff;border-left:3px solid #698dff;border-radius:9px;padding:12px 14px;font-size:13px;color:#40547c;line-height:1.7;margin:16px 0 0}
+.config{display:grid;gap:13px}
+label.control-label{display:block;font-weight:700;font-size:13px;margin-bottom:6px}
+select,input[type=text]{width:100%;padding:12px 13px;border-radius:10px;border:1px solid #cbd7e8;background:white;color:var(--ink);outline-color:#7193f7}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:8px;border:1px solid transparent;border-radius:11px;padding:12px 17px;font-weight:750;font-size:14px;text-decoration:none}
+.btn.primary{background:var(--blue);color:white}
+.btn.primary:hover:not(:disabled){background:#244dbf}
+.btn.ghost{background:white;color:#364a6a;border-color:#cad7e9}
+.btn.soft{background:#eef3ff;color:#3054a9}
+.btn.good{background:#16825b;color:white}
+.btn.warn{background:#fff4ec;color:#b84c23;border-color:#f1c1ac}
+.btn:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #8dacf8;outline-offset:2px}
+.setup-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.guide{margin-top:22px}
+.guide-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+.pill{background:#f3f6fc;border:1px solid #e5ebf4;border-radius:13px;padding:14px 10px;min-width:0}
+.pill strong{display:block;font-size:13px;margin-bottom:4px}
+.pill span{font-size:12px;color:var(--muted)}
+.source-note{font-size:12px;color:#718098;margin-top:16px;line-height:1.7}
+.hidden,[hidden]{display:none!important}
+.session-head{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:17px}
+.session-head .tiny{font-size:12px;color:var(--muted);margin-bottom:3px}
+.session-head strong{font-size:21px}
+.progressbar{height:9px;width:100%;border-radius:20px;background:#e6edfa;overflow:hidden;margin:13px 0 22px}
+.progressbar>div{width:0;background:linear-gradient(90deg,#3568e7,#17a68c);height:100%;border-radius:20px;transition:width .25s}
+.tags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:15px}
+.tag{padding:6px 10px;border-radius:40px;background:#eaf0ff;color:#3158a6;font-weight:700;font-size:12px}
+.tag.gray{background:#edf1f6;color:#64748b}
+.question-title{font-size:20px;line-height:1.6;margin:0 0 16px;font-weight:790}
+pre.code{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65;font-size:14px;tab-size:4;background:#14243d;color:#eaf3ff;border-radius:13px;padding:18px 19px;overflow-x:auto;font-family:Consolas,Monaco,"D2Coding",monospace}
+.answer-title{font-weight:700;font-size:14px;margin:22px 0 9px}
+.answer-area{display:flex;flex-direction:column;gap:11px}
+.answer-area input{font-size:16px}
+.option{display:flex;align-items:flex-start;gap:12px;border:1px solid #d7e1f0;padding:13px;border-radius:11px;cursor:pointer;line-height:1.5;background:white}
+.option:hover{background:#f8fbff}
+.option.selected{border-color:#6088e8;background:#eff5ff}
+.option input{margin-top:4px;accent-color:var(--blue)}
+.actions{display:flex;gap:9px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:20px}
+.right-buttons{display:flex;gap:9px}
+.feedback{margin-top:22px;padding:18px 19px;border-radius:13px;border:1px solid #bde5d0;background:#f1fbf5}
+.feedback.bad{background:#fff9f1;border-color:#f4d3a1}
+.feedback .status{font-size:17px;font-weight:800;margin-bottom:9px}
+.feedback.bad .status{color:#b65c24}
+.feedback:not(.bad) .status{color:#147952}
+.feedback .label{font-size:12px;color:#668078;margin-top:10px;font-weight:700}
+.feedback .answer-key{font-size:15px;font-weight:800;margin-top:3px;white-space:pre-wrap;overflow-wrap:anywhere}
+.feedback .why{font-size:14px;line-height:1.75;margin-top:9px;white-space:pre-wrap}
+.tiny-help{font-size:12px;color:#708097;margin-top:7px;line-height:1.6}
+.quiz-layout{max-width:830px;margin:auto}
+.result-mark{text-align:center;font-size:35px;color:#204fc5;font-weight:850}
+.result-mark span{display:block;font-size:13px;font-weight:650;color:#62738e}
+.result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.result-stats>div{text-align:center;padding:19px 7px;background:#f2f6fd;border-radius:13px}
+.result-stats strong{font-size:25px;display:block}
+.result-stats span{color:#667894;font-size:12px}
+.result-actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.session-message{font-size:13px;color:#667894}
+.note{font-size:12px;color:#718198;line-height:1.75;margin-top:18px}
+footer{text-align:center;padding:10px 16px 32px;color:#70809a;font-size:12px}
+@media(max-width:750px){header{padding:15px 18px}main{margin-top:21px}.hero{grid-template-columns:1fr}h1{font-size:26px}.panel{padding:19px 16px}.guide-grid{grid-template-columns:repeat(2,1fr)}.pill:last-child{grid-column:span 2}.kpi strong{font-size:21px}.question-title{font-size:18px}.btn{padding:11px 12px}pre.code{font-size:12px;padding:15px}.result-stats{gap:7px}}
+</style>
+<script defer src="./questions.js"></script>
+<script defer src="./app.js"></script>
+</head>
+<body>
+<header>
+<div><div class="brand">⌘ C언어 문제은행</div><div class="sub">고등학교 2학년 정보과학 · 교재 기반 학습</div></div>
+<a href="../">← 웹앱 모음</a>
+</header>
+<main>
+<section id="home">
+<div class="hero">
+<div class="hero-info">
+<div class="eyebrow">✓ PDF 교재 6쪽 기반 · 정답 및 해설 포함</div>
+<h1>코드를 읽고, 채점하고,<br>이해하는 C언어 연습</h1>
+<p class="lead">단답형, 실행 결과 분석, 코드 빈칸, 오류 수정, 응용 문제를 풀고 바로 정답과 해설을 확인하세요. 틀린 문제만 다시 풀 수도 있습니다.</p>
+<div class="kpis">
+<div class="kpi"><strong>100</strong><span>전체 문제 수</span></div>
+<div class="kpi"><strong>5</strong><span>문제 유형</span></div>
+<div class="kpi"><strong>6</strong><span>교재 쪽수</span></div>
+</div>
+<div class="alert">학습용 문제은행입니다. 문제와 정답은 웹브라우저로 내려받아 채점하므로 정식 시험의 부정행위 방지 용도로는 적합하지 않습니다.</div>
+</div>
+<div class="panel">
+<h2>연습 시작</h2>
+<div class="config">
+<div><label class="control-label" for="unit">학습 범위</label><select id="unit"><option value="all">전체 범위</option></select></div>
+<div><label class="control-label" for="kind">문제 유형</label><select id="kind"><option value="all">모든 유형</option><option value="short">단답형</option><option value="trace">프로그램 실행 결과</option><option value="blank">코드 빈칸 넣기</option><option value="debug">오류 찾기</option><option value="apply">프로그램 응용</option></select></div>
+<div><label class="control-label" for="count">출제 문항 수</label><select id="count"><option value="10">10문제</option><option value="20" selected>20문제</option><option value="30">30문제</option><option value="all">선택 범위 전체</option></select></div>
+<div class="setup-actions"><button class="btn primary" id="start">연습 시작 →</button><button class="btn soft" id="reviewWrong">오답 다시 풀기</button></div>
+<div id="homeInfo" class="tiny-help"></div>
+<div><button class="btn ghost" id="resume" hidden>이어서 풀기</button></div>
+</div>
+</div>
+</div>
+<div class="panel guide">
+<h2>문제 구성</h2>
+<div class="guide-grid">
+<div class="pill"><strong>단답형</strong><span>20문제 · 개념 확인</span></div>
+<div class="pill"><strong>실행 결과</strong><span>30문제 · 코드 추적</span></div>
+<div class="pill"><strong>빈칸 넣기</strong><span>25문제 · 구문 완성</span></div>
+<div class="pill"><strong>오류 수정</strong><span>15문제 · 코드 진단</span></div>
+<div class="pill"><strong>응용</strong><span>10문제 · 프로그램 완성</span></div>
+</div>
+<p class="source-note">출처: 제공된 「정보과학 C언어 프린트」의 1~6쪽. 자료형·입출력·연산자·조건문·반복문·배열 내용을 바탕으로 연습문항을 새롭게 구성했습니다. 교재 속 과거 방식 중 안전하지 않은 gets()는 출제에서 제외했습니다.</p>
+<div class="tiny-help" id="history"></div>
+<button id="clearHistory" class="btn ghost" style="margin-top:11px;font-size:12px">저장된 학습 기록 초기화</button>
+</div>
+</section>
+<section id="quiz" hidden>
+<div class="quiz-layout">
+<div class="session-head">
+<div><div class="tiny">C언어 실전 연습</div><strong id="position">문제 1 / 20</strong></div>
+<div class="right-buttons"><button class="btn ghost" id="backHome">학습 선택으로</button></div>
+</div>
+<div class="progressbar" aria-label="채점 진행도"><div id="progress"></div></div>
+<article class="panel">
+<div class="tags"><span id="typeBadge" class="tag">단답형</span><span id="unitBadge" class="tag gray">변수</span><span id="pageBadge" class="tag gray">교재 1쪽</span></div>
+<h2 id="question" class="question-title"></h2>
+<pre id="code" class="code" hidden></pre>
+<div class="answer-title" id="answerTitle">정답 입력</div>
+<div id="answerArea" class="answer-area"></div>
+<div class="tiny-help" id="hint">키보드로 답을 입력하고 채점하기를 누르세요.</div>
+<div id="feedback" class="feedback" hidden aria-live="polite"></div>
+<div class="actions">
+<button class="btn ghost" id="prev">← 이전 문제</button>
+<div class="right-buttons"><button class="btn primary" id="grade">채점 및 해설</button><button class="btn soft" id="next">다음 문제 →</button></div>
+</div>
+</article>
+<p class="note">학생의 답안과 진행 상황은 해당 브라우저에만 저장됩니다. 별도 계정이나 Gemini API 호출 없이 채점됩니다. 코드 출력 문제는 표준 C언어의 정의된 동작을 기준으로 합니다.</p>
+</div>
+</section>
+<section id="result" hidden>
+<div class="quiz-layout panel">
+<h2 style="text-align:center">연습 결과</h2>
+<div class="result-mark" id="score">0%<span>정답률</span></div>
+<div class="result-stats"><div><strong id="goodCount">0</strong><span>정답</span></div><div><strong id="badCount">0</strong><span>오답</span></div><div><strong id="skippedCount">0</strong><span>미응답</span></div></div>
+<p class="muted" id="resultMessage" style="text-align:center"></p>
+<div class="result-actions"><button class="btn primary" id="retryWrong">이번 오답 다시 풀기</button><button class="btn ghost" id="goHome">새 연습 선택</button></div>
+</div>
+</section>
+</main>
+<footer>정보과학 C언어 문제은행 · 교재 기반 학습 목적 · 자동 채점</footer>
+</body>
+</html>
