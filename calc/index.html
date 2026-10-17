@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#176450">
+  <meta name="description" content="스마트폰과 컴퓨터에서 편하게 사용하는 한국어 사칙연산 계산기">
+  <title>간단 계산기</title>
+  <style>
+    :root{color-scheme:light;--ink:#17392f;--green:#176450;--muted:#64796f;--paper:#f3f5ef}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;min-height:100svh;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;display:grid;grid-template-columns:minmax(0,1fr);place-items:center;padding:28px 18px}
+    main{width:100%;max-width:390px}.eyebrow{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:750;letter-spacing:.16em;color:var(--green)}.dot{height:7px;width:7px;border-radius:50%;background:var(--green)}h1{font-size:29px;letter-spacing:-1.3px;margin:14px 0 8px;font-weight:750}.intro{font-size:14px;color:var(--muted);margin:0 0 26px;line-height:1.6}
+    .calculator{background:#fff;border:1px solid #dce4da;border-radius:28px;padding:20px;box-shadow:0 16px 50px #17392f0a}.display{background:#edf3eb;border-radius:16px;padding:20px 18px 19px;min-height:145px;display:flex;flex-direction:column;justify-content:space-between;margin-bottom:18px}.label{font-size:11px;font-weight:650;letter-spacing:.07em;color:var(--muted)}#expression{min-height:20px;text-align:right;font-size:14px;color:var(--muted);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}output{display:block;font-size:38px;font-weight:650;letter-spacing:-1px;text-align:right;line-height:1.2;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}output.small{font-size:25px}.keys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}button{border:0;border-radius:14px;min-height:60px;background:#f3f5f1;color:var(--ink);font:600 24px/1 system-ui,sans-serif;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .12s,transform .12s}button:hover{background:#e6ece3}button:active{transform:scale(.95)}button:focus-visible{outline:3px solid #a56a16;outline-offset:3px}.wide{grid-column:span 2}.utility{font-size:16px;color:#50665c;background:#eaf0e7}.operator{color:var(--green);background:#deeee3;font-size:28px}.equals{background:var(--green);color:#fff}.equals:hover{background:#0d4f3e}.footnote{font-size:12px;line-height:1.7;color:var(--muted);text-align:center;margin:20px 0 0}.keyboard{display:block;margin-top:5px;color:#819085}.bottom{margin-top:26px;border-top:1px solid #dce4da;padding-top:14px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:.08em;color:#819085}
+    @media(max-width:360px){body{padding:20px 12px}.calculator{padding:15px}.keys{gap:8px}button{min-height:56px}output{font-size:33px}}@media(prefers-reduced-motion:reduce){button{transition:none}}
+  </style>
+</head>
+<body>
+  <main>
+    <header><div class="eyebrow"><span class="dot" aria-hidden="true"></span> EVERYDAY TOOLS / 01</div><h1>간단 계산기</h1><p class="intro">복잡한 건 빼고, 필요한 계산만 가볍게.</p></header>
+    <section class="calculator" aria-label="사칙연산 계산기">
+      <div class="display"><span class="label">사칙연산</span><div id="expression" aria-label="계산식"></div><output id="result" aria-label="계산 결과" aria-live="polite" aria-atomic="true">0</output></div>
+      <div class="keys">
+        <button class="utility wide" data-action="clear" aria-label="모두 지우기">전체 지우기</button><button class="utility" data-action="backspace" aria-label="한 글자 지우기">⌫</button><button class="operator" data-value="/" aria-label="나누기">÷</button>
+        <button data-value="7">7</button><button data-value="8">8</button><button data-value="9">9</button><button class="operator" data-value="*" aria-label="곱하기">×</button>
+        <button data-value="4">4</button><button data-value="5">5</button><button data-value="6">6</button><button class="operator" data-value="-" aria-label="빼기">−</button>
+        <button data-value="1">1</button><button data-value="2">2</button><button data-value="3">3</button><button class="operator" data-value="+" aria-label="더하기">+</button>
+        <button class="wide" data-value="0">0</button><button data-value="." aria-label="소수점">.</button><button class="equals" data-action="equals" aria-label="계산하기">=</button>
+      </div>
+    </section>
+    <p class="footnote">곱셈·나눗셈을 먼저 계산해요.<span class="keyboard">키보드 입력 · Enter 계산 · Esc 초기화</span></p>
+    <footer class="bottom"><span>CALC — 간단 계산기</span><span>매일의 작은 계산</span></footer>
+    <noscript>계산기를 사용하려면 브라우저의 JavaScript를 켜 주세요.</noscript>
+  </main>
+  <script>
+    'use strict';
+    // Recursive descent evaluates only numbers and four operators; no eval or remote requests.
+    function calculate(source) {
+      const tokens = source.match(/(?:\d+(?:\.\d*)?|\.\d+)|[+*/-]/g) || [];
+      if (tokens.join('') !== source || !tokens.length) throw new Error('계산식을 확인해 주세요');
+      let position = 0;
+      function number() {
+        if (tokens[position] === '+') { position++; return number(); }
+        if (tokens[position] === '-') { position++; return -number(); }
+        const token = tokens[position++];
+        if (!token || !/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(token)) throw new Error('숫자를 입력해 주세요');
+        return Number(token);
+      }
+      function product() {
+        let value = number();
+        while (tokens[position] === '*' || tokens[position] === '/') {
+          const operator = tokens[position++], right = number();
+          if (operator === '/' && right === 0) throw new Error('0으로 나눌 수 없어요');
+          value = operator === '*' ? value * right : value / right;
+        }
+        return value;
+      }
+      let value = product();
+      while (tokens[position] === '+' || tokens[position] === '-') {
+        const operator = tokens[position++], right = product();
+        value = operator === '+' ? value + right : value - right;
+      }
+      if (position !== tokens.length || !Number.isFinite(value)) throw new Error('계산 범위를 초과했어요');
+      return Object.is(value, -0) ? 0 : Number(value.toPrecision(12));
+    }
+    // Expand scientific notation so a result can be used in the next calculation.
+    function decimal(value) {
+      const text = String(value);
+      if (!/e/i.test(text)) return text;
+      const [coefficient, exponentText] = text.toLowerCase().split('e');
+      const sign = coefficient.startsWith('-') ? '-' : '';
+      const unsigned = coefficient.replace('-', '');
+      const [whole, fraction = ''] = unsigned.split('.');
+      const digits = whole + fraction, point = whole.length + Number(exponentText);
+      return sign + (point <= 0 ? '0.' + '0'.repeat(-point) + digits : point >= digits.length ? digits + '0'.repeat(point - digits.length) : digits.slice(0, point) + '.' + digits.slice(point));
+    }
+    const result = document.getElementById('result');
+    const expression = document.getElementById('expression');
+    let input = '', finished = false, failed = false;
+    const symbols = text => text.replace(/\*/g, ' × ').replace(/\//g, ' ÷ ').replace(/\+/g, ' + ').replace(/-/g, ' − ');
+    function show(text = input || '0') {
+      result.textContent = text;
+      result.classList.toggle('small', text.length > 15);
+    }
+    function clear() { input = ''; finished = false; failed = false; expression.textContent = ''; show(); }
+    function append(value) {
+      if (failed || (finished && /[\d.]/.test(value))) clear();
+      finished = false;
+      if (input.length >= 120) { expression.textContent = '최대 120자까지 입력할 수 있어요'; return; }
+      if (/[\d.]/.test(value)) {
+        const lastNumber = input.split(/[+*/-]/).pop();
+        if (value === '.' && lastNumber.includes('.')) return;
+        if (value === '.' && !lastNumber) value = '0.';
+        if (/\d/.test(value) && lastNumber === '0') input = input.slice(0, -1);
+      } else {
+        if (!input && value !== '-') return;
+        if (/[+*/-]$/.test(input)) {
+          if (value === '-' && /[*/]$/.test(input)) { input += value; show(symbols(input)); return; }
+          input = input.replace(/[+*/-]+$/, '');
+          if (!input && value !== '-') return;
+        }
+      }
+      input += value;
+      expression.textContent = '';
+      show(symbols(input));
+    }
+    function action(name) {
+      if (name === 'clear') return clear();
+      if (name === 'backspace') {
+        if (failed) return clear();
+        finished = false; input = input.slice(0, -1); expression.textContent = ''; show(symbols(input) || '0'); return;
+      }
+      if (name === 'equals' && input && !finished) {
+        try {
+          const answer = calculate(input);
+          expression.textContent = symbols(input) + ' =';
+          input = decimal(answer); finished = true; show(String(answer));
+        } catch (error) { show(error.message); failed = true; }
+      }
+    }
+    document.querySelector('.keys').addEventListener('click', event => {
+      const button = event.target.closest('button');
+      if (!button) return;
+      if (button.dataset.action) action(button.dataset.action); else append(button.dataset.value);
+    });
+    document.addEventListener('keydown', event => {
+      if (event.ctrlKey || event.metaKey || event.altKey || event.isComposing) return;
+      if (/^[\d.+*/-]$/.test(event.key)) { event.preventDefault(); append(event.key); }
+      else if (event.key === 'Enter' || event.key === '=') { event.preventDefault(); action('equals'); }
+      else if (event.key === 'Escape') { event.preventDefault(); clear(); }
+      else if (event.key === 'Backspace' || event.key === 'Delete') { event.preventDefault(); action('backspace'); }
+    });
+  </script>
+</body>
+</html>
